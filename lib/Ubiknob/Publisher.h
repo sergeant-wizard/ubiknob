@@ -1,4 +1,5 @@
 #pragma once
+#include <Dual.h>
 #include <Knob.h>
 #include <Single.h>
 
@@ -25,6 +26,27 @@ namespace ubiknob {
                 case SingleKnobMode::hdg:
                 break;
                 case SingleKnobMode::vsp:
+                break;
+            }
+        }
+    };
+
+    template<>
+    class Publisher<DualKnobMode> {
+        public:
+        static void update(DualKnobMode mode, KnobState state, bool is_inner) {
+            if (state == KnobState::unchanged) {
+                return;
+            }
+            switch(mode) {
+                // TODO
+                case DualKnobMode::com1:
+                break;
+                case DualKnobMode::com2:
+                break;
+                case DualKnobMode::nav1:
+                break;
+                case DualKnobMode::nav2:
                 break;
             }
         }
