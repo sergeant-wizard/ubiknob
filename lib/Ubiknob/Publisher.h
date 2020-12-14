@@ -1,9 +1,9 @@
 #pragma once
 #include <usb_flightsim.h>
 
-#include <Dual.h>
-#include <Knob.h>
-#include <Single.h>
+#include "Dual.h"
+#include "Knob.h"
+#include "Single.h"
 
 namespace ubiknob {
     class UpDownCommand {
