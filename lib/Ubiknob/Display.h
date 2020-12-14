@@ -1,5 +1,5 @@
 #pragma once
-// #include "LiquidCrystal.h"
+#include "LiquidCrystal.h"
 
 #include "Dual.h"
 #include "Single.h"
@@ -21,6 +21,7 @@ namespace ubiknob {
             case SingleKnobMode::mode_vsp:
             return vsp;
         }
+        __builtin_unreachable();
     }
     static const char com1[5] = "COM1";
     static const char com2[5] = "COM2";
@@ -37,20 +38,21 @@ namespace ubiknob {
             case DualKnobMode::mode_nav2:
             return nav2;
         }
+        __builtin_unreachable();
     }
     class LCD {
         public:
-        LCD(int rs, int en, int d4, int d5, int d6, int d7)//:
-        // lcd(rs, en, d4, d5, d6, d7)
+        LCD(int rs, int en, int d4, int d5, int d6, int d7):
+        lcd(rs, en, d4, d5, d6, d7)
         {
         }
         void update(SingleKnobMode single_mode, DualKnobMode dual_mode) {
-            // lcd.begin(0, 0);
-            // lcd.print(format_single_mode(single_mode));
-            // lcd.begin(0, 5);
-            // lcd.print(format_dual_mode(dual_mode));
+            lcd.begin(0, 0);
+            lcd.print(format_single_mode(single_mode));
+            lcd.begin(0, 5);
+            lcd.print(format_dual_mode(dual_mode));
         }
         private:
-        // LiquidCrystal lcd;
+        LiquidCrystal lcd;
     };
 }

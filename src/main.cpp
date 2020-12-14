@@ -21,7 +21,7 @@ static const auto dual_value_inner_knob = KnobReader();
 static const auto dual_value_outer_knob = KnobReader();
 
 // TODO: set pins
-static auto lcd = LCD(0, 0, 0, 0, 0, 0);
+static auto lcd = ubiknob::LCD(0, 0, 0, 0, 0, 0);
 
 void setup() {
     pinMode(LED_BUILTIN, OUTPUT);
