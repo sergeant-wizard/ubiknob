@@ -14,7 +14,11 @@ namespace ubiknob {
             command = reference;
         }
         void run(KnobDiff diff) {
-            command = command + diff;
+            if (diff == 0) {
+                return;
+            } else {
+                command = command + diff;
+            }
         }
         private:
         FlightSimInteger command;
