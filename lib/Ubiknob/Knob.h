@@ -1,4 +1,5 @@
 #pragma once
+#include <Bounce.h>
 #include <Encoder.h>
 
 namespace ubiknob {
@@ -16,5 +17,28 @@ namespace ubiknob {
         private:
         Encoder enc;
         int prev;
+    };
+    enum ButtonState {
+        unchanged,
+        rising,
+        falling,
+    };
+    static constexpr int interval = 5;
+    class ButtonReader {
+        public:
+        ButtonReader(int pin): button(pin, interval) {
+        }
+        ButtonState update() {
+            button.update();
+            if (button.fallingEdge()) {
+                return ButtonState::falling;
+            } else if (button.risingEdge()) {
+                return ButtonState::rising;
+            } else {
+                return ButtonState::unchanged;
+            }
+        }
+        private:
+        Bounce button;
     };
 };
