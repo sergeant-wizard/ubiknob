@@ -28,6 +28,8 @@ void setup() {
 }
 
 void loop() {
+    FlightSim.update();
+
     // modes
     const auto single_mode_state = single_mode_knob.update();
     single_mode_selector.update(single_mode_state);
