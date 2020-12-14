@@ -10,15 +10,15 @@
 using namespace ubiknob;
 
 // modes
-static const auto single_mode_knob = KnobReader();
+static auto single_mode_knob = KnobReader(0, 0);
 static auto single_mode_selector = ModeSelector<SingleKnobMode, NUM_SINGLE_KNOB_MODE>(SingleKnobMode::mode_alt);
-static const auto dual_mode_knob = KnobReader();
+static auto dual_mode_knob = KnobReader(0, 0);
 static auto dual_mode_selector = ModeSelector<DualKnobMode, NUM_DUAL_KNOB_MODE>(DualKnobMode::mode_com1);
 
 // values
-static const auto single_value_knob = KnobReader();
-static const auto dual_value_inner_knob = KnobReader();
-static const auto dual_value_outer_knob = KnobReader();
+static auto single_value_knob = KnobReader(0, 0);
+static auto dual_value_inner_knob = KnobReader(0, 0);
+static auto dual_value_outer_knob = KnobReader(0, 0);
 
 // TODO: set pins
 static auto lcd = ubiknob::LCD(0, 0, 0, 0, 0, 0);

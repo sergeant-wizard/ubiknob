@@ -6,82 +6,68 @@
 #include "Single.h"
 
 namespace ubiknob {
-    class UpDownCommand {
+    class DiffCommand {
         public:
-        UpDownCommand(
-            const _XpRefStr_ *up,
-            const _XpRefStr_ *down
+        DiffCommand(
+            const _XpRefStr_ *reference
         ) {
-            up_command.assign(up);
-            down_command.assign(down);
+            command = reference;
         }
-        void run(KnobState state) {
-            if (state == KnobState::cw) {
-                up_command.once();
-            } else if (state == KnobState::ccw) {
-                down_command.once();
-            }
+        void run(KnobDiff diff) {
+            command = command + diff;
         }
         private:
-        FlightSimCommand up_command;
-        FlightSimCommand down_command;
+        FlightSimInteger command;
     };
     template<class T>
     class Publisher {
         public:
-        void update(T mode, KnobState state) const;
+        void update(T mode, KnobDiff state) const;
     };
 
     template<>
     class Publisher<SingleKnobMode> {
         public:
-        static void update(SingleKnobMode mode, KnobState state) {
+        static void update(SingleKnobMode mode, KnobDiff diff) {
             switch (mode) {
                 // TODO
                 case SingleKnobMode::mode_alt:
-                alt.run(state);
+                alt.run(diff);
                 break;
                 case SingleKnobMode::mode_crs:
-                crs.run(state);
+                crs.run(diff);
                 break;
                 case SingleKnobMode::mode_hdg:
-                hdg.run(state);
+                hdg.run(diff);
                 break;
                 case SingleKnobMode::mode_vsp:
-                vsp.run(state);
+                vsp.run(diff);
                 break;
             }
         }
         private:
-        static UpDownCommand alt;
-        static UpDownCommand crs;
-        static UpDownCommand hdg;
-        static UpDownCommand vsp;
+        static DiffCommand alt;
+        static DiffCommand crs;
+        static DiffCommand hdg;
+        static DiffCommand vsp;
     };
-    UpDownCommand Publisher<SingleKnobMode>::alt = UpDownCommand(
-        XPlaneRef("sim/autopilot/altitude_up"),
-        XPlaneRef("sim/autopilot/altitude_down")
+    DiffCommand Publisher<SingleKnobMode>::alt = DiffCommand(
+        XPlaneRef("sim/autopilot/altitude")
     );
-    UpDownCommand Publisher<SingleKnobMode>::crs = UpDownCommand(
-        XPlaneRef("sim/GPS/g1000n1_crs_up"),
-        XPlaneRef("sim/GPS/g1000n1_crs_down")
+    DiffCommand Publisher<SingleKnobMode>::crs = DiffCommand(
+        XPlaneRef("sim/cockpit/gps/course")
     );
-    UpDownCommand Publisher<SingleKnobMode>::hdg = UpDownCommand(
-        XPlaneRef("sim/autopilot/heading_up"),
-        XPlaneRef("sim/autopilot/heading_down")
+    DiffCommand Publisher<SingleKnobMode>::hdg = DiffCommand(
+        XPlaneRef("sim/autopilot/heading")
     );
-    UpDownCommand Publisher<SingleKnobMode>::vsp = UpDownCommand(
-        XPlaneRef("sim/autopilot/vertical_speed_up"),
-        XPlaneRef("sim/autopilot/vertical_speed_down")
+    DiffCommand Publisher<SingleKnobMode>::vsp = DiffCommand(
+        XPlaneRef("sim/autopilot/vertical_speed")
     );
 
     template<>
     class Publisher<DualKnobMode> {
         public:
-        static void update(DualKnobMode mode, KnobState state, bool is_inner) {
-            if (state == KnobState::unchanged) {
-                return;
-            }
+        static void update(DualKnobMode mode, KnobDiff diff, bool is_inner) {
             switch(mode) {
                 // TODO
                 case DualKnobMode::mode_com1:

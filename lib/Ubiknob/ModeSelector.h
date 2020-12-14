@@ -8,23 +8,13 @@ namespace ubiknob {
             mode(mode)
         {
         }
-        void update(KnobState state) {
-            if (state == KnobState::cw) {
-                next();
-            } else if (state == KnobState::ccw) {
-                prev();
-            }
+        void update(KnobDiff diff) {
+            mode = static_cast<T>((mode + diff) % N);
         }
         T getMode() const {
-            return this->mode;
+            return mode;
         }
         private:
-        void next() {
-            this->mode = static_cast<T>((mode + 1) % N);
-        }
-        void prev() {
-            this->mode = static_cast<T>((mode - 1) % N);
-        }
         T mode;
     };
 }
