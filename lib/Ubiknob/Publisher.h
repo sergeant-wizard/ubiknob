@@ -19,13 +19,13 @@ namespace ubiknob {
             }
             switch (mode) {
                 // TODO
-                case SingleKnobMode::alt:
+                case SingleKnobMode::mode_alt:
                 break;
-                case SingleKnobMode::crs:
+                case SingleKnobMode::mode_crs:
                 break;
-                case SingleKnobMode::hdg:
+                case SingleKnobMode::mode_hdg:
                 break;
-                case SingleKnobMode::vsp:
+                case SingleKnobMode::mode_vsp:
                 break;
             }
         }
@@ -40,13 +40,13 @@ namespace ubiknob {
             }
             switch(mode) {
                 // TODO
-                case DualKnobMode::com1:
+                case DualKnobMode::mode_com1:
                 break;
-                case DualKnobMode::com2:
+                case DualKnobMode::mode_com2:
                 break;
-                case DualKnobMode::nav1:
+                case DualKnobMode::mode_nav1:
                 break;
-                case DualKnobMode::nav2:
+                case DualKnobMode::mode_nav2:
                 break;
             }
         }
