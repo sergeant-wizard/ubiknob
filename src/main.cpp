@@ -30,6 +30,14 @@ static constexpr int PIN_DVO2 = 9;
 static constexpr int PIN_SB = 10;
 static constexpr int PIN_DB = 11;
 
+// LCD
+static constexpr int PIN_LCD_RS = 12;
+static constexpr int PIN_LCD_EN = 13;
+static constexpr int PIN_LCD_D4 = 14;
+static constexpr int PIN_LCD_D5 = 15;
+static constexpr int PIN_LCD_D6 = 16;
+static constexpr int PIN_LCD_D7 = 17;
+
 // modes
 static auto single_mode_knob = KnobReader(PIN_SM1, PIN_SM2);
 static auto single_mode_selector = ModeSelector<SingleKnobMode, NUM_SINGLE_KNOB_MODE>(SingleKnobMode::mode_alt);
@@ -43,11 +51,31 @@ static auto dual_value_inner_knob = KnobReader(PIN_DVI1, PIN_DVI2);
 static auto dual_value_outer_knob = KnobReader(PIN_DVO1, PIN_DVO2);
 static auto dual_value_button = ButtonReader(PIN_DB);
 
-// TODO: set pins
-static auto lcd = ubiknob::LCD(0, 0, 0, 0, 0, 0);
+static auto lcd = ubiknob::LCD(
+    PIN_LCD_RS,
+    PIN_LCD_EN,
+    PIN_LCD_D4,
+    PIN_LCD_D5,
+    PIN_LCD_D6,
+    PIN_LCD_D7
+);
 
 void setup() {
-    pinMode(LED_BUILTIN, OUTPUT);
+    pinMode(PIN_SV1, INPUT);
+    pinMode(PIN_SV2, INPUT);
+    pinMode(PIN_DVI1, INPUT);
+    pinMode(PIN_DVI2, INPUT);
+    pinMode(PIN_DVO1, INPUT);
+    pinMode(PIN_DVO2, INPUT);
+    pinMode(PIN_SB, INPUT);
+    pinMode(PIN_DB, INPUT);
+
+    pinMode(PIN_LCD_EN, OUTPUT); // TODO: check
+    pinMode(PIN_LCD_RS, OUTPUT);
+    pinMode(PIN_LCD_D4, OUTPUT);
+    pinMode(PIN_LCD_D5, OUTPUT);
+    pinMode(PIN_LCD_D6, OUTPUT);
+    pinMode(PIN_LCD_D7, OUTPUT);
 }
 
 void loop() {
