@@ -14,9 +14,7 @@ namespace ubiknob {
             command = reference;
         }
         void run(KnobDiff diff) {
-            if (diff == 0) {
-                return;
-            } else {
+            if (diff != 0) {
                 command = command + diff;
             }
         }
