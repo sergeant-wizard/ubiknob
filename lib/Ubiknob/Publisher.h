@@ -70,7 +70,7 @@ namespace ubiknob {
         crs_diff(XPlaneRef("sim/cockpit/gps/course"), 1),
         obs_diff(XPlaneRef("sim/cockpit/radios/nav1_obs_degm"), 1),
         hdg_diff(XPlaneRef("sim/cockpit/autopilot/heading"), 1),
-        vsp_diff(XPlaneRef("sim/cockpit/autopilot/vertical_speed"), 100)
+        vsp_diff(XPlaneRef("sim/cockpit/autopilot/vertical_velocity"), 100)
         {}
         void update(SingleKnobMode mode, KnobDiff diff) {
             switch(mode) {
@@ -151,7 +151,7 @@ namespace ubiknob {
         void update(KnobDiff diff, bool is_inner) {
             auto frequency = make_frequency(is_com, standby_value);
             if (is_inner) {
-                frequency.change_khz(diff * 10);
+                frequency.change_khz(diff);
             } else {
                 frequency.change_mhz(diff);
             }
@@ -173,6 +173,11 @@ namespace ubiknob {
     class Publisher<DualKnobMode> {
         public:
         Publisher():
+        com1(FrequencyManager(
+            XPlaneRef("sim/cockpit/radios/com1_freq_hz"),
+            XPlaneRef("sim/cockpit/radios/com1_stdby_freq_hz"),
+            true
+        )),
         nav1(FrequencyManager(
             XPlaneRef("sim/cockpit/radios/nav1_freq_hz"),
             XPlaneRef("sim/cockpit/radios/nav1_stdby_freq_hz"),
@@ -182,9 +187,9 @@ namespace ubiknob {
         }
         void update(DualKnobMode mode, KnobDiff diff, bool is_inner) {
             switch(mode) {
-                // TODO
                 case DualKnobMode::mode_com1:
-                break;
+                    com1.update(diff, is_inner);
+                    break;
                 case DualKnobMode::mode_com2:
                 break;
                 case DualKnobMode::mode_nav1:
@@ -206,6 +211,7 @@ namespace ubiknob {
             }
         }
         private:
+        FrequencyManager com1;
         FrequencyManager nav1;
     };
 }
