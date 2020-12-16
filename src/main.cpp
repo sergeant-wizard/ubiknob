@@ -51,6 +51,10 @@ static auto dual_value_inner_knob = KnobReader(PIN_DVI1, PIN_DVI2);
 static auto dual_value_outer_knob = KnobReader(PIN_DVO1, PIN_DVO2);
 static auto dual_value_button = ButtonReader(PIN_DB);
 
+// publishers
+static auto single_publisher = Publisher<SingleKnobMode>();
+static auto dual_publisher = Publisher<DualKnobMode>();
+
 static auto lcd = ubiknob::LCD(
     PIN_LCD_RS,
     PIN_LCD_EN,
@@ -76,6 +80,7 @@ void setup() {
     pinMode(PIN_LCD_D5, OUTPUT);
     pinMode(PIN_LCD_D6, OUTPUT);
     pinMode(PIN_LCD_D7, OUTPUT);
+    pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop() {
@@ -95,14 +100,52 @@ void loop() {
     const auto single_button_diff = single_value_button.update();
     const auto dual_button_diff = dual_value_button.update();
 
-    // publish to xplane
-    Publisher<SingleKnobMode>::update(single_mode_selector.getMode(), single_value_diff);
-    Publisher<DualKnobMode>::update(dual_mode_selector.getMode(), dual_value_inner_diff, true);
-    Publisher<DualKnobMode>::update(dual_mode_selector.getMode(), dual_value_outer_diff, false);
-
-    Publisher<SingleKnobMode>::update(single_mode_selector.getMode(), single_button_diff);
-    Publisher<DualKnobMode>::update(dual_mode_selector.getMode(), dual_button_diff);
-
     // show display
     lcd.update(single_mode_selector.getMode(), dual_mode_selector.getMode());
+
+    // publish to xplane
+    single_publisher.update(single_mode_selector.getMode(), single_button_diff);
+    dual_publisher.update(dual_mode_selector.getMode(), dual_button_diff);
+
+    // for some reason only one emission is allowed per frame
+    if (single_value_diff != 0) {
+        single_publisher.update(single_mode_selector.getMode(), single_value_diff);
+        return;
+    }
+    if (dual_value_inner_diff != 0) {
+        dual_publisher.update(dual_mode_selector.getMode(), dual_value_inner_diff, true);
+        return;
+    }
+    if (dual_value_outer_diff != 0) {
+        dual_publisher.update(dual_mode_selector.getMode(), dual_value_outer_diff, false);
+        return;
+    }
+}
+
+// test connection with xplane
+static int hoge = 0;
+void dual() {
+    FlightSim.update();
+    hoge++;
+    if (hoge % 3 == 0) {
+        dual_publisher.update(DualKnobMode::mode_nav1, 1, false);
+    } else if (hoge % 3 == 1) {
+        dual_publisher.update(DualKnobMode::mode_nav1, 1, true);
+    } else {
+        dual_publisher.update(DualKnobMode::mode_nav1, ButtonState::falling);
+    }
+    delay(500);
+}
+
+void single() {
+    FlightSim.update();
+    hoge++;
+    if (hoge % 3 == 0) {
+        single_publisher.update(SingleKnobMode::mode_hdg, 1);
+    } else if (hoge % 3 == 1) {
+        single_publisher.update(SingleKnobMode::mode_hdg, ButtonState::rising);
+    } else if (hoge % 3 == 0) {
+        single_publisher.update(SingleKnobMode::mode_hdg, ButtonState::falling);
+    }
+    delay(500);
 }

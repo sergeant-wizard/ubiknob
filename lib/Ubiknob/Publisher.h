@@ -2,6 +2,7 @@
 #include <usb_flightsim.h>
 
 #include "Dual.h"
+#include "Frequency.h"
 #include "Knob.h"
 #include "Single.h"
 
@@ -40,6 +41,21 @@ namespace ubiknob {
         FlightSimCommand command;
     };
 
+    class ValueManager {
+        public:
+        ValueManager(const _XpRefStr_* diff, int interval):
+        interval(interval)
+        {
+            sim_int = diff;
+        }
+        void update(KnobDiff diff) {
+            sim_int = sim_int + diff * interval;
+        }
+        private:
+        FlightSimInteger sim_int;
+        const int interval;
+    };
+
     template<class T>
     class Publisher {
         public:
@@ -49,23 +65,30 @@ namespace ubiknob {
     template<>
     class Publisher<SingleKnobMode> {
         public:
-        static void update(SingleKnobMode mode, KnobDiff diff) {
+        Publisher():
+        alt_diff(XPlaneRef("sim/cockpit/autopilot/altitude"), 100),
+        crs_diff(XPlaneRef("sim/cockpit/gps/course"), 1),
+        obs_diff(XPlaneRef("sim/cockpit/radios/nav1_obs_degm"), 1),
+        hdg_diff(XPlaneRef("sim/cockpit/autopilot/heading"), 1),
+        vsp_diff(XPlaneRef("sim/cockpit/autopilot/vertical_speed"), 100)
+        {}
+        void update(SingleKnobMode mode, KnobDiff diff) {
             switch(mode) {
                 case SingleKnobMode::mode_alt:
-                alt_diff.run(diff);
+                alt_diff.update(diff);
                 break;
                 case SingleKnobMode::mode_crs:
-                crs_diff.run(diff);
+                crs_diff.update(diff);
                 break;
                 case SingleKnobMode::mode_hdg:
-                hdg_diff.run(diff);
+                hdg_diff.update(diff);
                 break;
                 case SingleKnobMode::mode_vsp:
-                vsp_diff.run(diff);
+                vsp_diff.update(diff);
                 break;
             }
         }
-        static void update(SingleKnobMode mode, ButtonState state) {
+        void update(SingleKnobMode mode, ButtonState state) {
             switch(mode) {
                 case SingleKnobMode::mode_alt:
                 alt_sync.run(state);
@@ -82,27 +105,16 @@ namespace ubiknob {
             }
         }
         private:
-        static DiffCommand alt_diff;
-        static DiffCommand crs_diff;
-        static DiffCommand hdg_diff;
-        static DiffCommand vsp_diff;
+        ValueManager alt_diff;
+        ValueManager crs_diff;
+        ValueManager obs_diff;
+        ValueManager hdg_diff;
+        ValueManager vsp_diff;
         static ButtonCommand alt_sync;
         static ButtonCommand crs_sync;
         static ButtonCommand hdg_sync;
         static ButtonCommand vsp_sync;
     };
-    DiffCommand Publisher<SingleKnobMode>::alt_diff = DiffCommand(
-        XPlaneRef("sim/autopilot/altitude")
-    );
-    DiffCommand Publisher<SingleKnobMode>::crs_diff = DiffCommand(
-        XPlaneRef("sim/cockpit/gps/course")
-    );
-    DiffCommand Publisher<SingleKnobMode>::hdg_diff = DiffCommand(
-        XPlaneRef("sim/autopilot/heading")
-    );
-    DiffCommand Publisher<SingleKnobMode>::vsp_diff = DiffCommand(
-        XPlaneRef("sim/autopilot/vertical_speed")
-    );
 
     ButtonCommand Publisher<SingleKnobMode>::alt_sync = ButtonCommand(
         XPlaneRef("sim/autopilot/altitude_sync")
@@ -117,10 +129,58 @@ namespace ubiknob {
         XPlaneRef("sim/autopilot/vertical_speed_sync")
     );
 
+    static Frequency make_frequency(bool is_com, FlightSimInteger fsi) {
+        const auto val = fsi.read();
+        return Frequency(is_com, val / 100, val % 100);
+    }
+    class FrequencyManager {
+        public:
+        FrequencyManager(const _XpRefStr_* active_ref, const _XpRefStr_* standby_ref, bool is_com):
+        is_com(is_com)
+        {
+            active_value = active_ref;
+            standby_value = standby_ref;
+            if (is_com) {
+                active_value = 11800;
+                standby_value = 11800;
+            } else {
+                active_value = 10800;
+                standby_value = 10800;
+            }
+        }
+        void update(KnobDiff diff, bool is_inner) {
+            auto frequency = make_frequency(is_com, standby_value);
+            if (is_inner) {
+                frequency.change_khz(diff * 10);
+            } else {
+                frequency.change_mhz(diff);
+            }
+            standby_value = frequency.to_long();
+        }
+        void swap() {
+            const auto new_active = standby_value.read();
+            const auto new_standby = active_value.read();
+            active_value = new_active;
+            standby_value = new_standby;
+        }
+        private:
+        const bool is_com;
+        FlightSimInteger active_value;
+        FlightSimInteger standby_value;
+    };
+
     template<>
     class Publisher<DualKnobMode> {
         public:
-        static void update(DualKnobMode mode, KnobDiff diff, bool is_inner) {
+        Publisher():
+        nav1(FrequencyManager(
+            XPlaneRef("sim/cockpit/radios/nav1_freq_hz"),
+            XPlaneRef("sim/cockpit/radios/nav1_stdby_freq_hz"),
+            false
+        ))
+        {
+        }
+        void update(DualKnobMode mode, KnobDiff diff, bool is_inner) {
             switch(mode) {
                 // TODO
                 case DualKnobMode::mode_com1:
@@ -128,12 +188,24 @@ namespace ubiknob {
                 case DualKnobMode::mode_com2:
                 break;
                 case DualKnobMode::mode_nav1:
-                break;
+                    nav1.update(diff, is_inner);
+                    break;
                 case DualKnobMode::mode_nav2:
                 break;
             }
         }
-        static void update(DualKnobMode mode, ButtonState state) {
+        void update(DualKnobMode mode, ButtonState state) {
+            switch(mode) {
+                case DualKnobMode::mode_nav1:
+                if (state == ButtonState::falling) {
+                    nav1.swap();
+                }
+                break;
+                default:
+                break;
+            }
         }
+        private:
+        FrequencyManager nav1;
     };
 }
