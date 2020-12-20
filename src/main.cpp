@@ -10,8 +10,8 @@
 using namespace ubiknob;
 
 // single mode pin
-static constexpr int PIN_SM1 = 0;
-static constexpr int PIN_SM2 = 1;
+static constexpr int PIN_SM1 = 31;
+static constexpr int PIN_SM2 = 32;
 // dual mode pin
 static constexpr int PIN_DM1 = 2;
 static constexpr int PIN_DM2 = 3;
@@ -31,12 +31,12 @@ static constexpr int PIN_SB = 10;
 static constexpr int PIN_DB = 11;
 
 // LCD
-static constexpr int PIN_LCD_RS = 12;
-static constexpr int PIN_LCD_EN = 13;
-static constexpr int PIN_LCD_D4 = 14;
-static constexpr int PIN_LCD_D5 = 15;
-static constexpr int PIN_LCD_D6 = 16;
-static constexpr int PIN_LCD_D7 = 17;
+static constexpr int PIN_LCD_RS = 38;
+static constexpr int PIN_LCD_EN = 37;
+static constexpr int PIN_LCD_D4 = 36;
+static constexpr int PIN_LCD_D5 = 35;
+static constexpr int PIN_LCD_D6 = 34;
+static constexpr int PIN_LCD_D7 = 33;
 
 // modes
 static auto single_mode_knob = KnobReader(PIN_SM1, PIN_SM2);
@@ -65,6 +65,9 @@ static auto lcd = ubiknob::LCD(
 );
 
 void setup() {
+    pinMode(PIN_DM1, INPUT);
+    pinMode(PIN_DM2, INPUT);
+
     pinMode(PIN_SV1, INPUT);
     pinMode(PIN_SV2, INPUT);
     pinMode(PIN_DVI1, INPUT);
@@ -74,13 +77,8 @@ void setup() {
     pinMode(PIN_SB, INPUT);
     pinMode(PIN_DB, INPUT);
 
-    pinMode(PIN_LCD_EN, OUTPUT); // TODO: check
-    pinMode(PIN_LCD_RS, OUTPUT);
-    pinMode(PIN_LCD_D4, OUTPUT);
-    pinMode(PIN_LCD_D5, OUTPUT);
-    pinMode(PIN_LCD_D6, OUTPUT);
-    pinMode(PIN_LCD_D7, OUTPUT);
     pinMode(LED_BUILTIN, OUTPUT);
+    lcd.update(single_mode_selector.getMode(), dual_mode_selector.getMode());
 }
 
 void loop() {
@@ -120,6 +118,19 @@ void loop() {
         dual_publisher.update(dual_mode_selector.getMode(), dual_value_outer_diff, false);
         return;
     }
+}
+
+// test rotary encoder input
+void rotary() {
+    /* int a = digitalRead(PIN_SM1); */
+    /* int b = digitalRead(PIN_SM2); */
+    /* Serial.println(a); */
+    /* Serial.println(b); */
+    /* Serial.println("done"); */
+
+    const auto single_mode_diff = single_mode_knob.update();
+    Serial.println(single_mode_diff);
+    delay(100);
 }
 
 // test connection with xplane

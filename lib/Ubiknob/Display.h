@@ -47,9 +47,9 @@ namespace ubiknob {
         {
         }
         void update(SingleKnobMode single_mode, DualKnobMode dual_mode) {
-            lcd.begin(0, 0);
+            lcd.begin(16, 2);
             lcd.print(format_single_mode(single_mode));
-            lcd.begin(0, 5);
+            lcd.setCursor(0, 1);
             lcd.print(format_dual_mode(dual_mode));
         }
         private:
