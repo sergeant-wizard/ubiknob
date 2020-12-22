@@ -12,7 +12,7 @@ namespace ubiknob {
             const auto current = enc.read();
             const auto diff = current - prev;
             prev = current;
-            return diff;
+            return diff / abs(diff);
         }
         private:
         Encoder enc;
