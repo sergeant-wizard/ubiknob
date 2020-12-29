@@ -72,11 +72,19 @@ void loop() {
     const auto right_button_diff = right_button.update();
 
     // show display
-    lcd.update(
-        left_mode_selector.getMode(),
-        right_mode_selector.getMode(),
-        publisher.getFrequencyManager(right_mode_selector.getMode())
-    );
+    if (
+        left_mode_diff != 0 ||
+        right_mode_diff != 0 ||
+        right_button_diff != 0 ||
+        right_inner_diff != 0 ||
+        right_outer_diff != 0
+    ) {
+        lcd.update(
+            left_mode_selector.getMode(),
+            right_mode_selector.getMode(),
+            publisher.getFrequencyManager(right_mode_selector.getMode())
+        );
+    }
 
     // publish to xplane
     publisher.update(left_mode_selector.getMode(), left_button_diff);
