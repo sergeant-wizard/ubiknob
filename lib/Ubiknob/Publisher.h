@@ -140,7 +140,7 @@ namespace ubiknob {
                     nav2.swap();
                 }
             }
-            
+
             if (mode == KnobMode::mode_alt) {
                 alt_sync.run(state);
             } else if (mode == KnobMode::mode_obs) {
