@@ -31,9 +31,9 @@ namespace ubiknob {
         }
         void run(ButtonState state) {
             if (state == ButtonState::falling) {
-                command = 0;
-            } else if (state == ButtonState::rising) {
                 command = 1;
+            } else if (state == ButtonState::rising) {
+                command = 0;
             }
         }
         private:
@@ -42,27 +42,43 @@ namespace ubiknob {
 
     class ValueManager {
         public:
-        ValueManager(const _XpRefStr_* diff, int interval):
-        interval(interval)
+        ValueManager(const _XpRefStr_* diff, int interval_small, int interval_large, bool is_cyclic):
+        interval_small(interval_small),
+        interval_large(interval_large),
+        is_cyclic(is_cyclic)
         {
             sim_int = diff;
         }
-        void update(KnobDiff diff) {
-            sim_int = sim_int + diff * interval;
+        void update(KnobDiff diff, bool is_small) {
+            if (is_small) {
+                sim_int = getUpdatedValue(diff, interval_small);
+            } else {
+                sim_int = getUpdatedValue(diff, interval_large);
+            }
         }
         private:
+        long getUpdatedValue(KnobDiff diff, int interval) const {
+            long ret = sim_int + diff * interval;
+            ret = ret - ret % interval_small;
+            if (is_cyclic) {
+                return (ret + 360) % 360;
+            } else {
+                return ret;
+            }
+        }
         FlightSimInteger sim_int;
-        const int interval;
+        const int interval_small;
+        const int interval_large;
+        const bool is_cyclic;
     };
 
     class Publisher {
         public:
         Publisher():
-        alt_diff(XPlaneRef("sim/cockpit/autopilot/altitude"), 100),
-        crs_diff(XPlaneRef("sim/cockpit/gps/course"), 1),
-        obs_diff(XPlaneRef("sim/cockpit/radios/nav1_obs_degm"), 1),
-        hdg_diff(XPlaneRef("sim/cockpit/autopilot/heading"), 1),
-        vsp_diff(XPlaneRef("sim/cockpit/autopilot/vertical_velocity"), 100),
+        alt_diff(XPlaneRef("sim/cockpit/autopilot/altitude"), 100, 1000, false),
+        obs_diff(XPlaneRef("sim/cockpit/radios/nav1_obs_degm"), 1, 10, true),
+        hdg_diff(XPlaneRef("sim/cockpit/autopilot/heading"), 1, 10, true),
+        vsp_diff(XPlaneRef("sim/cockpit/autopilot/vertical_velocity"), 100, 1000, false),
         com1(FrequencyManager(
             XPlaneRef("sim/cockpit/radios/com1_freq_hz"),
             XPlaneRef("sim/cockpit/radios/com1_stdby_freq_hz"),
@@ -87,16 +103,16 @@ namespace ubiknob {
         void update(KnobMode mode, KnobDiff diff, bool is_inner) {
             switch(mode) {
                 case KnobMode::mode_alt:
-                    alt_diff.update(diff);
+                    alt_diff.update(diff, is_inner);
                     break;
-                case KnobMode::mode_crs:
-                    crs_diff.update(diff);
+                case KnobMode::mode_obs:
+                    obs_diff.update(diff, is_inner);
                     break;
                 case KnobMode::mode_hdg:
-                    hdg_diff.update(diff);
+                    hdg_diff.update(diff, is_inner);
                     break;
                 case KnobMode::mode_vsp:
-                    vsp_diff.update(diff);
+                    vsp_diff.update(diff, is_inner);
                     break;
                 case KnobMode::mode_com1:
                     com1.update(diff, is_inner);
@@ -113,34 +129,26 @@ namespace ubiknob {
             }
         }
         void update(KnobMode mode, ButtonState state) {
-            if (state != ButtonState::falling) {
-                return;
-            }
-            switch(mode) {
-                case KnobMode::mode_alt:
-                    alt_sync.run(state);
-                    break;
-                case KnobMode::mode_crs:
-                    crs_sync.run(state);
-                    break;
-                case KnobMode::mode_hdg:
-                    hdg_sync.run(state);
-                    break;
-                case KnobMode::mode_vsp:
-                    vsp_sync.run(state);
-                    break;
-                case KnobMode::mode_com1:
+            if (state == ButtonState::falling) {
+                if (mode == KnobMode::mode_com1) {
                     com1.swap();
-                    break;
-                case KnobMode::mode_com2:
+                } else if (mode == KnobMode::mode_com2) {
                     com2.swap();
-                    break;
-                case KnobMode::mode_nav1:
+                } else if (mode == KnobMode::mode_nav1) {
                     nav1.swap();
-                    break;
-                case KnobMode::mode_nav2:
+                } else if (mode == KnobMode::mode_nav2) {
                     nav2.swap();
-                    break;
+                }
+            }
+            
+            if (mode == KnobMode::mode_alt) {
+                alt_sync.run(state);
+            } else if (mode == KnobMode::mode_obs) {
+                obs_sync.run(state);
+            } else if (mode == KnobMode::mode_hdg) {
+                hdg_sync.run(state);
+            } else if (mode == KnobMode::mode_vsp) {
+                vsp_sync.run(state);
             }
         }
         const FrequencyManager& getFrequencyManager(KnobMode mode) const {
@@ -158,12 +166,11 @@ namespace ubiknob {
         }
         private:
         ValueManager alt_diff;
-        ValueManager crs_diff;
         ValueManager obs_diff;
         ValueManager hdg_diff;
         ValueManager vsp_diff;
         static ButtonCommand alt_sync;
-        static ButtonCommand crs_sync;
+        static ButtonCommand obs_sync;
         static ButtonCommand hdg_sync;
         static ButtonCommand vsp_sync;
         FrequencyManager com1;
@@ -175,7 +182,7 @@ namespace ubiknob {
     ButtonCommand Publisher::alt_sync = ButtonCommand(
         XPlaneRef("sim/autopilot/altitude_sync")
     );
-    ButtonCommand Publisher::crs_sync = ButtonCommand(
+    ButtonCommand Publisher::obs_sync = ButtonCommand(
         XPlaneRef("sim/GPS/g1000n1_crs_sync")
     );
     ButtonCommand Publisher::hdg_sync = ButtonCommand(

@@ -11,7 +11,7 @@ using namespace ubiknob;
 // modes
 static const KnobMode left_modes[4] = {
     KnobMode::mode_alt,
-    KnobMode::mode_crs,
+    KnobMode::mode_obs,
     KnobMode::mode_hdg,
     KnobMode::mode_vsp,
 };

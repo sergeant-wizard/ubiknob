@@ -44,7 +44,7 @@ namespace ubiknob {
 
     enum KnobMode {
         mode_alt = 0,
-        mode_crs = 1,
+        mode_obs = 1,
         mode_hdg = 2,
         mode_vsp = 3,
         mode_com1 = 4,
