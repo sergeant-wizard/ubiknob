@@ -1,59 +1,30 @@
 #include <Arduino.h>
 
 #include "Display.h"
-#include "Dual.h"
 #include "Knob.h"
 #include "ModeSelector.h"
+#include "Pins.h"
 #include "Publisher.h"
-#include "Single.h"
 
 using namespace ubiknob;
 
-// single mode pin
-static constexpr int PIN_SM1 = 31;
-static constexpr int PIN_SM2 = 32;
-// dual mode pin
-static constexpr int PIN_DM1 = 2;
-static constexpr int PIN_DM2 = 3;
-
-// single value pin
-static constexpr int PIN_SV1 = 4;
-static constexpr int PIN_SV2 = 5;
-// dual value inner pin
-static constexpr int PIN_DVI1 = 6;
-static constexpr int PIN_DVI2 = 7;
-// dual value outer pin
-static constexpr int PIN_DVO1 = 8;
-static constexpr int PIN_DVO2 = 9;
-
-// buttons
-static constexpr int PIN_SB = 10;
-static constexpr int PIN_DB = 11;
-
-// LCD
-static constexpr int PIN_LCD_RS = 38;
-static constexpr int PIN_LCD_EN = 37;
-static constexpr int PIN_LCD_D4 = 36;
-static constexpr int PIN_LCD_D5 = 35;
-static constexpr int PIN_LCD_D6 = 34;
-static constexpr int PIN_LCD_D7 = 33;
-
 // modes
-static auto single_mode_knob = KnobReader(PIN_SM1, PIN_SM2);
-static auto single_mode_selector = ModeSelector<SingleKnobMode, NUM_SINGLE_KNOB_MODE>(SingleKnobMode::mode_alt);
-static auto dual_mode_knob = KnobReader(PIN_DM1, PIN_DM2);
-static auto dual_mode_selector = ModeSelector<DualKnobMode, NUM_DUAL_KNOB_MODE>(DualKnobMode::mode_com1);
+static auto left_mode_knob = KnobReader(PIN_MIDDLE_OUTER1, PIN_MIDDLE_OUTER2);
+static auto left_mode_selector = ModeSelector<LeftKnobMode, NUM_LEFT_KNOB_MODE>(LeftKnobMode::mode_alt);
+static auto right_mode_knob = KnobReader(PIN_MIDDLE_INNER1, PIN_MIDDLE_INNER2);
+static auto right_mode_selector = ModeSelector<RightKnobMode, NUM_RIGHT_KNOB_MODE>(RightKnobMode::mode_com1);
 
 // values
-static auto single_value_knob = KnobReader(PIN_SV1, PIN_SV2);
-static auto single_value_button = ButtonReader(PIN_SB);
-static auto dual_value_inner_knob = KnobReader(PIN_DVI1, PIN_DVI2);
-static auto dual_value_outer_knob = KnobReader(PIN_DVO1, PIN_DVO2);
-static auto dual_value_button = ButtonReader(PIN_DB);
+static auto left_inner_knob = KnobReader(PIN_LEFT_INNER1, PIN_LEFT_INNER2);
+static auto left_outer_knob = KnobReader(PIN_LEFT_OUTER1, PIN_LEFT_OUTER2);
+static auto left_button = ButtonReader(PIN_LEFT_BUTTON);
+static auto right_inner_knob = KnobReader(PIN_RIGHT_INNER1, PIN_RIGHT_INNER2);
+static auto right_outer_knob = KnobReader(PIN_RIGHT_OUTER1, PIN_RIGHT_OUTER2);
+static auto right_button = ButtonReader(PIN_RIGHT_BUTTON);
 
 // publishers
-static auto single_publisher = Publisher<SingleKnobMode>();
-static auto dual_publisher = Publisher<DualKnobMode>();
+static auto left_publisher = Publisher<LeftKnobMode>();
+static auto right_publisher = Publisher<RightKnobMode>();
 
 static auto lcd = ubiknob::LCD(
     PIN_LCD_RS,
@@ -65,57 +36,50 @@ static auto lcd = ubiknob::LCD(
 );
 
 void setup() {
-    pinMode(PIN_DM1, INPUT);
-    pinMode(PIN_DM2, INPUT);
-
-    pinMode(PIN_SV1, INPUT);
-    pinMode(PIN_SV2, INPUT);
-    pinMode(PIN_DVI1, INPUT);
-    pinMode(PIN_DVI2, INPUT);
-    pinMode(PIN_DVO1, INPUT);
-    pinMode(PIN_DVO2, INPUT);
-    pinMode(PIN_SB, INPUT);
-    pinMode(PIN_DB, INPUT);
-
     pinMode(LED_BUILTIN, OUTPUT);
-    lcd.update(single_mode_selector.getMode(), dual_mode_selector.getMode());
+    lcd.update(left_mode_selector.getMode(), right_mode_selector.getMode());
 }
 
 void loop() {
     FlightSim.update();
 
     // modes
-    const auto single_mode_diff = single_mode_knob.update();
-    single_mode_selector.update(single_mode_diff);
-    const auto dual_mode_diff = dual_mode_knob.update();
-    dual_mode_selector.update(dual_mode_diff);
+    const auto left_mode_diff = left_mode_knob.update();
+    left_mode_selector.update(left_mode_diff);
+    const auto right_mode_diff = right_mode_knob.update();
+    right_mode_selector.update(right_mode_diff);
 
     // values
-    const auto single_value_diff = single_value_knob.update();
-    const auto dual_value_inner_diff = dual_value_inner_knob.update();
-    const auto dual_value_outer_diff = dual_value_outer_knob.update();
+    const auto left_value_inner_diff = left_inner_knob.update();
+    const auto left_value_outer_diff = left_outer_knob.update();
+    const auto right_value_inner_diff = right_inner_knob.update();
+    const auto right_value_outer_diff = right_outer_knob.update();
 
-    const auto single_button_diff = single_value_button.update();
-    const auto dual_button_diff = dual_value_button.update();
+    const auto left_button_diff = left_button.update();
+    const auto right_button_diff = right_button.update();
 
     // show display
-    lcd.update(single_mode_selector.getMode(), dual_mode_selector.getMode());
+    lcd.update(left_mode_selector.getMode(), right_mode_selector.getMode());
 
     // publish to xplane
-    single_publisher.update(single_mode_selector.getMode(), single_button_diff);
-    dual_publisher.update(dual_mode_selector.getMode(), dual_button_diff);
+    left_publisher.update(left_mode_selector.getMode(), left_button_diff);
+    right_publisher.update(right_mode_selector.getMode(), right_button_diff);
 
     // for some reason only one emission is allowed per frame
-    if (single_value_diff != 0) {
-        single_publisher.update(single_mode_selector.getMode(), single_value_diff);
+    if (left_value_inner_diff != 0) {
+        left_publisher.update(left_mode_selector.getMode(), left_value_inner_diff, true);
         return;
     }
-    if (dual_value_inner_diff != 0) {
-        dual_publisher.update(dual_mode_selector.getMode(), dual_value_inner_diff, true);
+    if (left_value_outer_diff != 0) {
+        left_publisher.update(left_mode_selector.getMode(), left_value_outer_diff, false);
         return;
     }
-    if (dual_value_outer_diff != 0) {
-        dual_publisher.update(dual_mode_selector.getMode(), dual_value_outer_diff, false);
+    if (right_value_inner_diff != 0) {
+        right_publisher.update(right_mode_selector.getMode(), right_value_inner_diff, true);
+        return;
+    }
+    if (right_value_outer_diff != 0) {
+        right_publisher.update(right_mode_selector.getMode(), right_value_outer_diff, false);
         return;
     }
 }
@@ -128,35 +92,35 @@ void rotary() {
     /* Serial.println(b); */
     /* Serial.println("done"); */
 
-    const auto single_mode_diff = single_mode_knob.update();
-    Serial.println(single_mode_diff);
+    const auto left_mode_diff = left_mode_knob.update();
+    Serial.println(left_mode_diff);
     delay(100);
 }
 
 // test connection with xplane
 static int hoge = 0;
-void dual() {
+void right() {
     FlightSim.update();
     hoge++;
     if (hoge % 3 == 0) {
-        dual_publisher.update(DualKnobMode::mode_nav1, 1, false);
+        right_publisher.update(RightKnobMode::mode_nav1, 1, false);
     } else if (hoge % 3 == 1) {
-        dual_publisher.update(DualKnobMode::mode_nav1, 1, true);
+        right_publisher.update(RightKnobMode::mode_nav1, 1, true);
     } else {
-        dual_publisher.update(DualKnobMode::mode_nav1, ButtonState::falling);
+        right_publisher.update(RightKnobMode::mode_nav1, ButtonState::falling);
     }
     delay(500);
 }
 
-void single() {
+void left() {
     FlightSim.update();
     hoge++;
     if (hoge % 3 == 0) {
-        single_publisher.update(SingleKnobMode::mode_hdg, 1);
+        left_publisher.update(LeftKnobMode::mode_hdg, 1);
     } else if (hoge % 3 == 1) {
-        single_publisher.update(SingleKnobMode::mode_hdg, ButtonState::rising);
+        left_publisher.update(LeftKnobMode::mode_hdg, ButtonState::rising);
     } else if (hoge % 3 == 0) {
-        single_publisher.update(SingleKnobMode::mode_hdg, ButtonState::falling);
+        left_publisher.update(LeftKnobMode::mode_hdg, ButtonState::falling);
     }
     delay(500);
 }

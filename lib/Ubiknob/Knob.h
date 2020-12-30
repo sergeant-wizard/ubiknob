@@ -41,4 +41,20 @@ namespace ubiknob {
         private:
         Bounce button;
     };
+
+    enum LeftKnobMode {
+        mode_alt = 0,
+        mode_crs = 1,
+        mode_hdg = 2,
+        mode_vsp = 3,
+    };
+    static constexpr int NUM_LEFT_KNOB_MODE = 4;
+
+    enum RightKnobMode {
+        mode_com1 = 0,
+        mode_com2 = 1,
+        mode_nav1 = 2,
+        mode_nav2 = 3,
+    };
+    static constexpr int NUM_RIGHT_KNOB_MODE = 4;
 };

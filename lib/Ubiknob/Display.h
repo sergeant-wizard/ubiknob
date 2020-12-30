@@ -1,8 +1,7 @@
 #pragma once
 #include "LiquidCrystal.h"
 
-#include "Dual.h"
-#include "Single.h"
+#include "Knob.h"
 
 
 namespace ubiknob {
@@ -12,13 +11,13 @@ namespace ubiknob {
     static const char vsp[4] = "VSP";
     static const char* format_single_mode(SingleKnobMode mode) {
         switch(mode) {
-            case SingleKnobMode::mode_alt:
+            case LeftKnobMode::mode_alt:
             return alt;
-            case SingleKnobMode::mode_crs:
+            case LeftKnobMode::mode_crs:
             return crs;
-            case SingleKnobMode::mode_hdg:
+            case LeftKnobMode::mode_hdg:
             return hdg;
-            case SingleKnobMode::mode_vsp:
+            case LeftKnobMode::mode_vsp:
             return vsp;
         }
         __builtin_unreachable();
@@ -29,13 +28,13 @@ namespace ubiknob {
     static const char nav2[5] = "NAV2";
     static const char* format_dual_mode(DualKnobMode mode) {
         switch(mode) {
-            case DualKnobMode::mode_com1:
+            case RightKnobMode::mode_com1:
             return com1;
-            case DualKnobMode::mode_com2:
+            case RightKnobMode::mode_com2:
             return com2;
-            case DualKnobMode::mode_nav1:
+            case RightKnobMode::mode_nav1:
             return nav1;
-            case DualKnobMode::mode_nav2:
+            case RightKnobMode::mode_nav2:
             return nav2;
         }
         __builtin_unreachable();
@@ -46,7 +45,7 @@ namespace ubiknob {
         lcd(rs, en, d4, d5, d6, d7)
         {
         }
-        void update(SingleKnobMode single_mode, DualKnobMode dual_mode) {
+        void update(LeftKnobMode single_mode, RightKnobMode dual_mode) {
             lcd.begin(16, 2);
             lcd.print(format_single_mode(single_mode));
             lcd.setCursor(0, 1);

@@ -1,16 +1,7 @@
+#include "Pins.h"
 #include "Power.h"
 
 using namespace ubiknob;
-
-static constexpr int PIN_RIGHT_INNER1 = 24;
-static constexpr int PIN_RIGHT_INNER2 = 25;
-static constexpr int PIN_RIGHT_OUTER1 = 27;
-static constexpr int PIN_RIGHT_OUTER2 = 26;
-
-static constexpr int PIN_LEFT_INNER1 = 29;
-static constexpr int PIN_LEFT_INNER2 = 30;
-static constexpr int PIN_LEFT_OUTER1 = 32;
-static constexpr int PIN_LEFT_OUTER2 = 31;
 
 static auto left_inner_knob = KnobReader(PIN_LEFT_INNER1, PIN_LEFT_INNER2);
 static auto left_outer_knob = KnobReader(PIN_LEFT_OUTER1, PIN_LEFT_OUTER2);

@@ -1,10 +1,8 @@
 #pragma once
 #include <usb_flightsim.h>
 
-#include "Dual.h"
 #include "Frequency.h"
 #include "Knob.h"
-#include "Single.h"
 
 namespace ubiknob {
     class DiffCommand {
@@ -63,7 +61,7 @@ namespace ubiknob {
     };
 
     template<>
-    class Publisher<SingleKnobMode> {
+    class Publisher<LeftKnobMode> {
         public:
         Publisher():
         alt_diff(XPlaneRef("sim/cockpit/autopilot/altitude"), 100),
@@ -72,34 +70,34 @@ namespace ubiknob {
         hdg_diff(XPlaneRef("sim/cockpit/autopilot/heading"), 1),
         vsp_diff(XPlaneRef("sim/cockpit/autopilot/vertical_velocity"), 100)
         {}
-        void update(SingleKnobMode mode, KnobDiff diff) {
+        void update(LeftKnobMode mode, KnobDiff diff) {
             switch(mode) {
-                case SingleKnobMode::mode_alt:
+                case LeftKnobMode::mode_alt:
                 alt_diff.update(diff);
                 break;
-                case SingleKnobMode::mode_crs:
+                case LeftKnobMode::mode_crs:
                 crs_diff.update(diff);
                 break;
-                case SingleKnobMode::mode_hdg:
+                case LeftKnobMode::mode_hdg:
                 hdg_diff.update(diff);
                 break;
-                case SingleKnobMode::mode_vsp:
+                case LeftKnobMode::mode_vsp:
                 vsp_diff.update(diff);
                 break;
             }
         }
-        void update(SingleKnobMode mode, ButtonState state) {
+        void update(LeftKnobMode mode, ButtonState state) {
             switch(mode) {
-                case SingleKnobMode::mode_alt:
+                case LeftKnobMode::mode_alt:
                 alt_sync.run(state);
                 break;
-                case SingleKnobMode::mode_crs:
+                case LeftKnobMode::mode_crs:
                 crs_sync.run(state);
                 break;
-                case SingleKnobMode::mode_hdg:
+                case LeftKnobMode::mode_hdg:
                 hdg_sync.run(state);
                 break;
-                case SingleKnobMode::mode_vsp:
+                case LeftKnobMode::mode_vsp:
                 vsp_sync.run(state);
                 break;
             }
@@ -116,16 +114,16 @@ namespace ubiknob {
         static ButtonCommand vsp_sync;
     };
 
-    ButtonCommand Publisher<SingleKnobMode>::alt_sync = ButtonCommand(
+    ButtonCommand Publisher<LeftKnobMode>::alt_sync = ButtonCommand(
         XPlaneRef("sim/autopilot/altitude_sync")
     );
-    ButtonCommand Publisher<SingleKnobMode>::crs_sync = ButtonCommand(
+    ButtonCommand Publisher<LeftKnobMode>::crs_sync = ButtonCommand(
         XPlaneRef("sim/GPS/g1000n1_crs_sync")
     );
-    ButtonCommand Publisher<SingleKnobMode>::hdg_sync = ButtonCommand(
+    ButtonCommand Publisher<LeftKnobMode>::hdg_sync = ButtonCommand(
         XPlaneRef("sim/autopilot/heading_sync")
     );
-    ButtonCommand Publisher<SingleKnobMode>::vsp_sync = ButtonCommand(
+    ButtonCommand Publisher<LeftKnobMode>::vsp_sync = ButtonCommand(
         XPlaneRef("sim/autopilot/vertical_speed_sync")
     );
 
@@ -170,7 +168,7 @@ namespace ubiknob {
     };
 
     template<>
-    class Publisher<DualKnobMode> {
+    class Publisher<RightKnobMode> {
         public:
         Publisher():
         com1(FrequencyManager(
@@ -185,23 +183,23 @@ namespace ubiknob {
         ))
         {
         }
-        void update(DualKnobMode mode, KnobDiff diff, bool is_inner) {
+        void update(RightKnobMode mode, KnobDiff diff, bool is_inner) {
             switch(mode) {
-                case DualKnobMode::mode_com1:
+                case RightKnobMode::mode_com1:
                     com1.update(diff, is_inner);
                     break;
-                case DualKnobMode::mode_com2:
+                case RightKnobMode::mode_com2:
                 break;
-                case DualKnobMode::mode_nav1:
+                case RightKnobMode::mode_nav1:
                     nav1.update(diff, is_inner);
                     break;
-                case DualKnobMode::mode_nav2:
+                case RightKnobMode::mode_nav2:
                 break;
             }
         }
-        void update(DualKnobMode mode, ButtonState state) {
+        void update(RightKnobMode mode, ButtonState state) {
             switch(mode) {
-                case DualKnobMode::mode_nav1:
+                case RightKnobMode::mode_nav1:
                 if (state == ButtonState::falling) {
                     nav1.swap();
                 }
