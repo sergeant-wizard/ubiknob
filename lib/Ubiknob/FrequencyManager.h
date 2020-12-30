@@ -39,6 +39,12 @@ namespace ubiknob {
             active_value = new_active;
             standby_value = new_standby;
         }
+        Frequency getActive() const {
+            return make_frequency(is_com, active_value);
+        }
+        Frequency getStandby() const {
+            return make_frequency(is_com, standby_value);
+        }
         private:
         const bool is_com;
         FlightSimInteger active_value;
