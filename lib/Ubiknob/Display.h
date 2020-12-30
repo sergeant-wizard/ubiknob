@@ -8,7 +8,7 @@
 
 namespace ubiknob {
     static const char alt[4] = "ALT";
-    static const char crs[4] = "CRS";
+    static const char obs[4] = "OBS";
     static const char hdg[4] = "HDG";
     static const char vsp[4] = "VSP";
     static const char com1[5] = "COM1";
@@ -19,8 +19,8 @@ namespace ubiknob {
         switch(mode) {
             case KnobMode::mode_alt:
             return alt;
-            case KnobMode::mode_crs:
-            return crs;
+            case KnobMode::mode_obs:
+            return obs;
             case KnobMode::mode_hdg:
             return hdg;
             case KnobMode::mode_vsp:
