@@ -1,20 +1,22 @@
 #pragma once
 
 namespace ubiknob {
-    template <class T, unsigned N>
+    template <unsigned N>
     class ModeSelector {
         public:
-        ModeSelector(T mode):
-            mode(mode)
+        ModeSelector(const KnobMode* modes):
+            mode_idx(0),
+            modes(modes)
         {
         }
         void update(KnobDiff diff) {
-            mode = static_cast<T>((mode + diff) % N);
+            mode_idx = (mode_idx + diff) % N;
         }
-        T getMode() const {
-            return mode;
+        KnobMode getMode() const {
+            return modes[mode_idx];
         }
         private:
-        T mode;
+        unsigned mode_idx;
+        const KnobMode* modes;
     };
 }
