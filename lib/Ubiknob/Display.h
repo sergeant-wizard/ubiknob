@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <LiquidCrystal.h>
 
-#include "Frequency.h"
+#include "FrequencyManager.h"
 #include "Knob.h"
 
 
@@ -45,9 +45,7 @@ namespace ubiknob {
         // 0123456789012345
         // ALT         NAV1
         // 114.000  109.050
-        void update(KnobMode left_mode, KnobMode right_mode) {
-            Frequency active(false, 114, 0);
-            Frequency standby(false, 109, 50);
+        void update(KnobMode left_mode, KnobMode right_mode, const FrequencyManager& manager) {
             lcd.begin(16, 2);
             lcd.setCursor(0, 0);
             lcd.print(format_mode(left_mode));
@@ -55,6 +53,8 @@ namespace ubiknob {
             lcd.print(format_mode(right_mode));
 
             char frequency_output[17];
+            const auto active = manager.getActive();
+            const auto standby = manager.getActive();
             snprintf(
                 frequency_output, 17, "%03d.%03d  %03d.%03d",
                 active.getMhz(), active.getKhz(), standby.getMhz(), standby.getKhz()
