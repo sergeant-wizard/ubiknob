@@ -68,36 +68,48 @@ namespace ubiknob {
             XPlaneRef("sim/cockpit/radios/com1_stdby_freq_hz"),
             true
         )),
+        com2(FrequencyManager(
+            XPlaneRef("sim/cockpit/radios/com2_freq_hz"),
+            XPlaneRef("sim/cockpit/radios/com2_stdby_freq_hz"),
+            true
+        )),
         nav1(FrequencyManager(
             XPlaneRef("sim/cockpit/radios/nav1_freq_hz"),
             XPlaneRef("sim/cockpit/radios/nav1_stdby_freq_hz"),
+            false
+        )),
+        nav2(FrequencyManager(
+            XPlaneRef("sim/cockpit/radios/nav2_freq_hz"),
+            XPlaneRef("sim/cockpit/radios/nav2_stdby_freq_hz"),
             false
         ))
         {}
         void update(KnobMode mode, KnobDiff diff, bool is_inner) {
             switch(mode) {
                 case KnobMode::mode_alt:
-                alt_diff.update(diff);
-                break;
+                    alt_diff.update(diff);
+                    break;
                 case KnobMode::mode_crs:
-                crs_diff.update(diff);
-                break;
+                    crs_diff.update(diff);
+                    break;
                 case KnobMode::mode_hdg:
-                hdg_diff.update(diff);
-                break;
+                    hdg_diff.update(diff);
+                    break;
                 case KnobMode::mode_vsp:
-                vsp_diff.update(diff);
-                break;
+                    vsp_diff.update(diff);
+                    break;
                 case KnobMode::mode_com1:
                     com1.update(diff, is_inner);
                     break;
                 case KnobMode::mode_com2:
-                break;
+                    com2.update(diff, is_inner);
+                    break;
                 case KnobMode::mode_nav1:
                     nav1.update(diff, is_inner);
                     break;
                 case KnobMode::mode_nav2:
-                break;
+                    nav2.update(diff, is_inner);
+                    break;
             }
         }
         void update(KnobMode mode, ButtonState state) {
@@ -106,30 +118,41 @@ namespace ubiknob {
             }
             switch(mode) {
                 case KnobMode::mode_alt:
-                alt_sync.run(state);
-                break;
+                    alt_sync.run(state);
+                    break;
                 case KnobMode::mode_crs:
-                crs_sync.run(state);
-                break;
+                    crs_sync.run(state);
+                    break;
                 case KnobMode::mode_hdg:
-                hdg_sync.run(state);
-                break;
+                    hdg_sync.run(state);
+                    break;
                 case KnobMode::mode_vsp:
-                vsp_sync.run(state);
-                break;
+                    vsp_sync.run(state);
+                    break;
                 case KnobMode::mode_com1:
-                com1.swap();
-                break;
+                    com1.swap();
+                    break;
+                case KnobMode::mode_com2:
+                    com2.swap();
+                    break;
                 case KnobMode::mode_nav1:
-                nav1.swap();
-                break;
+                    nav1.swap();
+                    break;
+                case KnobMode::mode_nav2:
+                    nav2.swap();
+                    break;
             }
         }
         const FrequencyManager& getFrequencyManager(KnobMode mode) const {
             if (mode == KnobMode::mode_com1) {
                 return com1;
+            } else if (mode == KnobMode::mode_com2) {
+                return com2;
             } else if (mode == KnobMode::mode_nav1) {
                 return nav1;
+            } else if (mode == KnobMode::mode_nav2) {
+                return nav2;
+
             }
             __builtin_unreachable();
         }
@@ -144,7 +167,9 @@ namespace ubiknob {
         static ButtonCommand hdg_sync;
         static ButtonCommand vsp_sync;
         FrequencyManager com1;
+        FrequencyManager com2;
         FrequencyManager nav1;
+        FrequencyManager nav2;
     };
 
     ButtonCommand Publisher::alt_sync = ButtonCommand(
