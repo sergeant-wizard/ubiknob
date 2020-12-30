@@ -38,6 +38,12 @@ namespace ubiknob {
         long to_long() const {
             return mhz * 100 + khz;
         }
+        int getMhz() const {
+            return mhz;
+        }
+        int getKhz() const {
+            return khz;
+        }
         private:
         long normalize(long current, int diff, int min, int max) {
             int period = max - min;

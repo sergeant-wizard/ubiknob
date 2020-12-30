@@ -1,6 +1,8 @@
 #pragma once
-#include "LiquidCrystal.h"
+#include <stdio.h>
+#include <LiquidCrystal.h>
 
+#include "Frequency.h"
 #include "Knob.h"
 
 
@@ -40,11 +42,25 @@ namespace ubiknob {
         lcd(rs, en, d4, d5, d6, d7)
         {
         }
+        // 0123456789012345
+        // ALT         NAV1
+        // 114.000  109.050
         void update(KnobMode left_mode, KnobMode right_mode) {
+            Frequency active(false, 114, 0);
+            Frequency standby(false, 109, 50);
             lcd.begin(16, 2);
+            lcd.setCursor(0, 0);
             lcd.print(format_mode(left_mode));
-            lcd.setCursor(0, 1);
+            lcd.setCursor(12, 0);
             lcd.print(format_mode(right_mode));
+
+            char frequency_output[17];
+            snprintf(
+                frequency_output, 17, "%03d.%03d  %03d.%03d",
+                active.getMhz(), active.getKhz(), standby.getMhz(), standby.getKhz()
+            );
+            lcd.setCursor(0, 1);
+            lcd.print(frequency_output);
         }
         private:
         LiquidCrystal lcd;
