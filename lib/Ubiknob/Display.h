@@ -54,7 +54,7 @@ namespace ubiknob {
 
             char frequency_output[17];
             const auto active = manager.getActive();
-            const auto standby = manager.getActive();
+            const auto standby = manager.getStandby();
             snprintf(
                 frequency_output, 17, "%03d.%03d  %03d.%03d",
                 active.getMhz(), active.getKhz(), standby.getMhz(), standby.getKhz()

@@ -22,9 +22,9 @@ static const KnobMode right_modes[4] = {
     KnobMode::mode_nav2,
 };
 
-static auto left_mode_knob = KnobReader(PIN_MIDDLE_OUTER1, PIN_MIDDLE_OUTER2);
+static auto left_mode_knob = KnobReader(PIN_MIDDLE_INNER1, PIN_MIDDLE_INNER2);
 static auto left_mode_selector = ModeSelector<4>(left_modes);
-static auto right_mode_knob = KnobReader(PIN_MIDDLE_INNER1, PIN_MIDDLE_INNER2);
+static auto right_mode_knob = KnobReader(PIN_MIDDLE_OUTER1, PIN_MIDDLE_OUTER2);
 static auto right_mode_selector = ModeSelector<4>(right_modes);
 
 // values
@@ -49,7 +49,6 @@ static auto lcd = ubiknob::LCD(
 
 void setup() {
     pinMode(LED_BUILTIN, OUTPUT);
-    lcd.update(left_mode_selector.getMode(), right_mode_selector.getMode());
 }
 
 void loop() {
@@ -62,36 +61,40 @@ void loop() {
     right_mode_selector.update(right_mode_diff);
 
     // values
-    const auto left_value_inner_diff = left_inner_knob.update();
-    const auto left_value_outer_diff = left_outer_knob.update();
-    const auto right_value_inner_diff = right_inner_knob.update();
-    const auto right_value_outer_diff = right_outer_knob.update();
+    const auto left_inner_diff = left_inner_knob.update();
+    const auto left_outer_diff = left_outer_knob.update();
+    const auto right_inner_diff = right_inner_knob.update();
+    const auto right_outer_diff = right_outer_knob.update();
 
     const auto left_button_diff = left_button.update();
     const auto right_button_diff = right_button.update();
 
     // show display
-    lcd.update(left_mode_selector.getMode(), right_mode_selector.getMode());
+    lcd.update(
+        left_mode_selector.getMode(),
+        right_mode_selector.getMode(),
+        publisher.getFrequencyManager(right_mode_selector.getMode())
+    );
 
     // publish to xplane
     publisher.update(left_mode_selector.getMode(), left_button_diff);
     publisher.update(right_mode_selector.getMode(), right_button_diff);
 
     // for some reason only one emission is allowed per frame
-    if (left_value_inner_diff != 0) {
-        publisher.update(left_mode_selector.getMode(), left_value_inner_diff, true);
+    if (left_inner_diff != 0) {
+        publisher.update(left_mode_selector.getMode(), left_inner_diff, true);
         return;
     }
-    if (left_value_outer_diff != 0) {
-        publisher.update(left_mode_selector.getMode(), left_value_outer_diff, false);
+    if (left_outer_diff != 0) {
+        publisher.update(left_mode_selector.getMode(), left_outer_diff, false);
         return;
     }
-    if (right_value_inner_diff != 0) {
-        publisher.update(right_mode_selector.getMode(), right_value_inner_diff, true);
+    if (right_inner_diff != 0) {
+        publisher.update(right_mode_selector.getMode(), right_inner_diff, true);
         return;
     }
-    if (right_value_outer_diff != 0) {
-        publisher.update(right_mode_selector.getMode(), right_value_outer_diff, false);
+    if (right_outer_diff != 0) {
+        publisher.update(right_mode_selector.getMode(), right_outer_diff, false);
         return;
     }
 }
@@ -128,7 +131,7 @@ void left() {
     FlightSim.update();
     hoge++;
     if (hoge % 3 == 0) {
-        publisher.update(KnobMode::mode_hdg, 1);
+        publisher.update(KnobMode::mode_hdg, 1, true);
     } else if (hoge % 3 == 1) {
         publisher.update(KnobMode::mode_hdg, ButtonState::rising);
     } else if (hoge % 3 == 0) {
