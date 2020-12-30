@@ -48,6 +48,8 @@ static auto lcd = ubiknob::LCD(
 );
 
 void setup() {
+    pinMode(PIN_LEFT_BUTTON, INPUT_PULLUP);
+    pinMode(PIN_RIGHT_BUTTON, INPUT_PULLUP);
     pinMode(LED_BUILTIN, OUTPUT);
 }
 

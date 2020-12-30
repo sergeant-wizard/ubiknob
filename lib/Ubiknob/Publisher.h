@@ -101,6 +101,9 @@ namespace ubiknob {
             }
         }
         void update(KnobMode mode, ButtonState state) {
+            if (state != ButtonState::falling) {
+                return;
+            }
             switch(mode) {
                 case KnobMode::mode_alt:
                 alt_sync.run(state);
@@ -114,17 +117,21 @@ namespace ubiknob {
                 case KnobMode::mode_vsp:
                 vsp_sync.run(state);
                 break;
+                case KnobMode::mode_com1:
+                com1.swap();
+                break;
                 case KnobMode::mode_nav1:
-                if (state == ButtonState::falling) {
-                    nav1.swap();
-                }
+                nav1.swap();
                 break;
             }
         }
         const FrequencyManager& getFrequencyManager(KnobMode mode) const {
             if (mode == KnobMode::mode_com1) {
                 return com1;
+            } else if (mode == KnobMode::mode_nav1) {
+                return nav1;
             }
+            __builtin_unreachable();
         }
         private:
         ValueManager alt_diff;
