@@ -121,6 +121,11 @@ namespace ubiknob {
                 break;
             }
         }
+        const FrequencyManager& getFrequencyManager(KnobMode mode) const {
+            if (mode == KnobMode::mode_com1) {
+                return com1;
+            }
+        }
         private:
         ValueManager alt_diff;
         ValueManager crs_diff;
