@@ -71,6 +71,21 @@ void loop() {
     const auto left_button_diff = left_button.update();
     const auto right_button_diff = right_button.update();
 
+    // publish to xplane
+    publisher.update(left_mode_selector.getMode(), left_button_diff);
+    publisher.update(right_mode_selector.getMode(), right_button_diff);
+
+    // for some reason only one emission is allowed per frame
+    if (left_inner_diff != 0) {
+        publisher.update(left_mode_selector.getMode(), left_inner_diff, true);
+    } else if (left_outer_diff != 0) {
+        publisher.update(left_mode_selector.getMode(), left_outer_diff, false);
+    } else if (right_inner_diff != 0) {
+        publisher.update(right_mode_selector.getMode(), right_inner_diff, true);
+    } else if (right_outer_diff != 0) {
+        publisher.update(right_mode_selector.getMode(), right_outer_diff, false);
+    }
+
     // show display
     if (
         left_mode_diff != 0 ||
@@ -84,29 +99,10 @@ void loop() {
             right_mode_selector.getMode(),
             publisher.getFrequencyManager(right_mode_selector.getMode())
         );
+    } else {
+        delay(250);
     }
 
-    // publish to xplane
-    publisher.update(left_mode_selector.getMode(), left_button_diff);
-    publisher.update(right_mode_selector.getMode(), right_button_diff);
-
-    // for some reason only one emission is allowed per frame
-    if (left_inner_diff != 0) {
-        publisher.update(left_mode_selector.getMode(), left_inner_diff, true);
-        return;
-    }
-    if (left_outer_diff != 0) {
-        publisher.update(left_mode_selector.getMode(), left_outer_diff, false);
-        return;
-    }
-    if (right_inner_diff != 0) {
-        publisher.update(right_mode_selector.getMode(), right_inner_diff, true);
-        return;
-    }
-    if (right_outer_diff != 0) {
-        publisher.update(right_mode_selector.getMode(), right_outer_diff, false);
-        return;
-    }
 }
 
 // test rotary encoder input
