@@ -71,13 +71,6 @@ void loop() {
     const auto left_button_diff = left_button.update();
     const auto right_button_diff = right_button.update();
 
-    // show display
-    lcd.update(
-        left_mode_selector.getMode(),
-        right_mode_selector.getMode(),
-        publisher.getFrequencyManager(right_mode_selector.getMode())
-    );
-
     // publish to xplane
     publisher.update(left_mode_selector.getMode(), left_button_diff);
     publisher.update(right_mode_selector.getMode(), right_button_diff);
@@ -85,20 +78,32 @@ void loop() {
     // for some reason only one emission is allowed per frame
     if (left_inner_diff != 0) {
         publisher.update(left_mode_selector.getMode(), left_inner_diff, true);
-        return;
-    }
-    if (left_outer_diff != 0) {
+    } else if (left_outer_diff != 0) {
         publisher.update(left_mode_selector.getMode(), left_outer_diff, false);
-        return;
-    }
-    if (right_inner_diff != 0) {
+    } else if (right_inner_diff != 0) {
         publisher.update(right_mode_selector.getMode(), right_inner_diff, true);
-        return;
-    }
-    if (right_outer_diff != 0) {
+    } else if (right_outer_diff != 0) {
         publisher.update(right_mode_selector.getMode(), right_outer_diff, false);
-        return;
     }
+
+    // show display
+    if (
+        left_mode_diff != 0 ||
+        right_mode_diff != 0 ||
+        right_button_diff != 0 ||
+        right_inner_diff != 0 ||
+        right_outer_diff != 0
+    ) {
+        lcd.update(
+            left_mode_selector.getMode(),
+            right_mode_selector.getMode(),
+            publisher.getFrequencyManager(right_mode_selector.getMode())
+        );
+    } else {
+        // without the delay, duplicate commands are sent
+        delay(250);
+    }
+
 }
 
 // test rotary encoder input
