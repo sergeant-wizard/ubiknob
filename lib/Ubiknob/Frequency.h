@@ -42,7 +42,16 @@ namespace ubiknob {
             return mhz;
         }
         int getKhz() const {
-            return khz;
+            // XPlane frequency representation
+            // 13542 = 135.425
+            // 13545 = 135.450
+            // 13547 = 135.475
+            // 13550 = 135.500
+            if (khz % 5 == 0) {
+                return khz * 10;
+            } else {
+                return khz * 10 + 5;
+            }
         }
         private:
         long normalize(long current, int diff, int min, int max) {
