@@ -100,6 +100,7 @@ void loop() {
             publisher.getFrequencyManager(right_mode_selector.getMode())
         );
     } else {
+        // without the delay, duplicate commands are sent
         delay(250);
     }
 
