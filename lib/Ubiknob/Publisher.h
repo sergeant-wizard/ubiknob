@@ -36,6 +36,9 @@ namespace ubiknob {
                 command = 0;
             }
         }
+        void runOnce() {
+            command.once();
+        }
         private:
         FlightSimCommand command;
     };
@@ -114,6 +117,22 @@ namespace ubiknob {
                 case KnobMode::mode_vsp:
                     vsp_diff.update(diff, is_inner);
                     break;
+                case KnobMode::mode_fms:
+                    if (is_inner) {
+                        if (diff < 0) {
+                            fms_inner_down.runOnce();
+                        } else if (diff > 0) {
+                            fms_inner_up.runOnce();
+                        }
+                    } else {
+                        if (diff < 0) {
+                            fms_outer_down.runOnce();
+                        } else if (diff > 0) {
+                            fms_outer_up.runOnce();
+                        }
+                    }
+                    vsp_diff.update(diff, is_inner);
+                    break;
                 case KnobMode::mode_com1:
                     com1.update(diff, is_inner);
                     break;
@@ -149,6 +168,8 @@ namespace ubiknob {
                 hdg_sync.run(state);
             } else if (mode == KnobMode::mode_vsp) {
                 vsp_sync.run(state);
+            } else if (mode == KnobMode::mode_fms) {
+                fms_cursor.run(state);
             }
         }
         const FrequencyManager& getFrequencyManager(KnobMode mode) const {
@@ -169,14 +190,19 @@ namespace ubiknob {
         ValueManager obs_diff;
         ValueManager hdg_diff;
         ValueManager vsp_diff;
-        static ButtonCommand alt_sync;
-        static ButtonCommand obs_sync;
-        static ButtonCommand hdg_sync;
-        static ButtonCommand vsp_sync;
         FrequencyManager com1;
         FrequencyManager com2;
         FrequencyManager nav1;
         FrequencyManager nav2;
+        static ButtonCommand alt_sync;
+        static ButtonCommand obs_sync;
+        static ButtonCommand hdg_sync;
+        static ButtonCommand vsp_sync;
+        static ButtonCommand fms_outer_up;
+        static ButtonCommand fms_outer_down;
+        static ButtonCommand fms_inner_up;
+        static ButtonCommand fms_inner_down;
+        static ButtonCommand fms_cursor;
     };
 
     ButtonCommand Publisher::alt_sync = ButtonCommand(
@@ -190,5 +216,20 @@ namespace ubiknob {
     );
     ButtonCommand Publisher::vsp_sync = ButtonCommand(
         XPlaneRef("sim/autopilot/vertical_speed_sync")
+    );
+    ButtonCommand Publisher::fms_outer_up = ButtonCommand(
+        XPlaneRef("sim/GPS/g1000n1_fms_outer_up")
+    );
+    ButtonCommand Publisher::fms_outer_down = ButtonCommand(
+        XPlaneRef("sim/GPS/g1000n1_fms_outer_down")
+    );
+    ButtonCommand Publisher::fms_inner_up = ButtonCommand(
+        XPlaneRef("sim/GPS/g1000n1_fms_inner_up")
+    );
+    ButtonCommand Publisher::fms_inner_down = ButtonCommand(
+        XPlaneRef("sim/GPS/g1000n1_fms_inner_down")
+    );
+    ButtonCommand Publisher::fms_cursor = ButtonCommand(
+        XPlaneRef("sim/GPS/g1000n1_cursor")
     );
 }

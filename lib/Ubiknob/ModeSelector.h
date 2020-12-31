@@ -10,7 +10,7 @@ namespace ubiknob {
         {
         }
         void update(KnobDiff diff) {
-            mode_idx = (mode_idx + diff) % N;
+            mode_idx = (mode_idx + diff + N) % N;
         }
         KnobMode getMode() const {
             return modes[mode_idx];

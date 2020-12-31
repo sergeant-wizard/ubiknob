@@ -9,11 +9,12 @@
 using namespace ubiknob;
 
 // modes
-static const KnobMode left_modes[4] = {
+static const KnobMode left_modes[5] = {
     KnobMode::mode_alt,
     KnobMode::mode_obs,
     KnobMode::mode_hdg,
     KnobMode::mode_vsp,
+    KnobMode::mode_fms,
 };
 static const KnobMode right_modes[4] = {
     KnobMode::mode_com1,
@@ -23,7 +24,7 @@ static const KnobMode right_modes[4] = {
 };
 
 static auto left_mode_knob = KnobReader(PIN_MIDDLE_INNER1, PIN_MIDDLE_INNER2);
-static auto left_mode_selector = ModeSelector<4>(left_modes);
+static auto left_mode_selector = ModeSelector<5>(left_modes);
 static auto right_mode_knob = KnobReader(PIN_MIDDLE_OUTER1, PIN_MIDDLE_OUTER2);
 static auto right_mode_selector = ModeSelector<4>(right_modes);
 

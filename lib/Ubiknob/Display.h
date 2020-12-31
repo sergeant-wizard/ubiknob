@@ -11,6 +11,7 @@ namespace ubiknob {
     static const char obs[4] = "OBS";
     static const char hdg[4] = "HDG";
     static const char vsp[4] = "VSP";
+    static const char fms[4] = "FMS";
     static const char com1[5] = "COM1";
     static const char com2[5] = "COM2";
     static const char nav1[5] = "NAV1";
@@ -25,6 +26,8 @@ namespace ubiknob {
             return hdg;
             case KnobMode::mode_vsp:
             return vsp;
+            case KnobMode::mode_fms:
+            return fms;
             case KnobMode::mode_com1:
             return com1;
             case KnobMode::mode_com2:
