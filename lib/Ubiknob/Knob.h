@@ -47,10 +47,10 @@ namespace ubiknob {
         mode_obs = 1,
         mode_hdg = 2,
         mode_vsp = 3,
-        mode_com1 = 4,
-        mode_com2 = 5,
-        mode_nav1 = 6,
-        mode_nav2 = 7,
+        mode_fms = 4,
+        mode_com1 = 5,
+        mode_com2 = 6,
+        mode_nav1 = 7,
+        mode_nav2 = 8,
     };
-    static constexpr int NUB_KNOB_MODES = 8;
 };
