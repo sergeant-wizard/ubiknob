@@ -100,11 +100,7 @@ void loop() {
             right_mode_selector.getMode(),
             publisher.getFrequencyManager(right_mode_selector.getMode())
         );
-    } else {
-        // without the delay, duplicate commands are sent
-        delay(250);
     }
-
 }
 
 // test rotary encoder input
