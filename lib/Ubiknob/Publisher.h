@@ -131,7 +131,6 @@ namespace ubiknob {
                             fms_outer_up.runOnce();
                         }
                     }
-                    vsp_diff.update(diff, is_inner);
                     break;
                 case KnobMode::mode_com1:
                     com1.update(diff, is_inner);
