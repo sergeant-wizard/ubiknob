@@ -50,18 +50,18 @@ namespace ubiknob {
         interval_large(interval_large),
         is_cyclic(is_cyclic)
         {
-            sim_int = diff;
+            sim_flt = diff;
         }
         void update(KnobDiff diff, bool is_small) {
             if (is_small) {
-                sim_int = getUpdatedValue(diff, interval_small);
+                sim_flt = getUpdatedValue(diff, interval_small);
             } else {
-                sim_int = getUpdatedValue(diff, interval_large);
+                sim_flt = getUpdatedValue(diff, interval_large);
             }
         }
         private:
         long getUpdatedValue(KnobDiff diff, int interval) const {
-            long ret = sim_int + diff * interval;
+            long ret = sim_flt + diff * interval;
             ret = ret - ret % interval_small;
             if (is_cyclic) {
                 return (ret + 360) % 360;
@@ -69,7 +69,7 @@ namespace ubiknob {
                 return ret;
             }
         }
-        FlightSimInteger sim_int;
+        FlightSimFloat sim_flt;
         const int interval_small;
         const int interval_large;
         const bool is_cyclic;
@@ -80,7 +80,7 @@ namespace ubiknob {
         Publisher():
         alt_diff(XPlaneRef("sim/cockpit/autopilot/altitude"), 100, 1000, false),
         obs_diff(XPlaneRef("sim/cockpit/radios/nav1_obs_degm"), 1, 10, true),
-        hdg_diff(XPlaneRef("sim/cockpit/autopilot/heading"), 1, 10, true),
+        hdg_diff(XPlaneRef("sim/cockpit/autopilot/heading_mag"), 1, 10, true),
         vsp_diff(XPlaneRef("sim/cockpit/autopilot/vertical_velocity"), 100, 1000, false),
         com1(FrequencyManager(
             XPlaneRef("sim/cockpit/radios/com1_freq_hz"),
