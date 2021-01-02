@@ -80,7 +80,7 @@ namespace ubiknob {
         Publisher():
         alt_diff(XPlaneRef("sim/cockpit/autopilot/altitude"), 100, 1000, false),
         obs_diff(XPlaneRef("sim/cockpit/radios/nav1_obs_degm"), 1, 10, true),
-        hdg_diff(XPlaneRef("sim/cockpit/autopilot/heading"), 1, 10, true),
+        hdg_diff(XPlaneRef("sim/cockpit/autopilot/heading_mag"), 1, 10, true),
         vsp_diff(XPlaneRef("sim/cockpit/autopilot/vertical_velocity"), 100, 1000, false),
         com1(FrequencyManager(
             XPlaneRef("sim/cockpit/radios/com1_freq_hz"),
