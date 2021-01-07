@@ -79,7 +79,6 @@ namespace ubiknob {
         public:
         Publisher():
         alt_diff(XPlaneRef("sim/cockpit/autopilot/altitude"), 100, 1000, false),
-        obs_diff(XPlaneRef("sim/cockpit/radios/nav1_obs_degm"), 1, 10, true),
         hdg_diff(XPlaneRef("sim/cockpit/autopilot/heading_mag"), 1, 10, true),
         vsp_diff(XPlaneRef("sim/cockpit/autopilot/vertical_velocity"), 100, 1000, false),
         com1(FrequencyManager(
@@ -109,7 +108,13 @@ namespace ubiknob {
                     alt_diff.update(diff, is_inner);
                     break;
                 case KnobMode::mode_obs:
-                    obs_diff.update(diff, is_inner);
+                    if (is_inner) {
+                        if (diff < 0) {
+                            obs_down.runOnce();
+                        } else if (diff > 0) {
+                            obs_up.runOnce();
+                        }
+                    }
                     break;
                 case KnobMode::mode_hdg:
                     hdg_diff.update(diff, is_inner);
@@ -186,7 +191,8 @@ namespace ubiknob {
         }
         private:
         ValueManager alt_diff;
-        ValueManager obs_diff;
+        static ButtonCommand obs_up;
+        static ButtonCommand obs_down;
         ValueManager hdg_diff;
         ValueManager vsp_diff;
         FrequencyManager com1;
@@ -204,6 +210,12 @@ namespace ubiknob {
         static ButtonCommand fms_cursor;
     };
 
+    ButtonCommand Publisher::obs_up = ButtonCommand(
+        XPlaneRef("sim/GPS/g1000n1_crs_up")
+    );
+    ButtonCommand Publisher::obs_down = ButtonCommand(
+        XPlaneRef("sim/GPS/g1000n1_crs_down")
+    );
     ButtonCommand Publisher::alt_sync = ButtonCommand(
         XPlaneRef("sim/autopilot/altitude_sync")
     );

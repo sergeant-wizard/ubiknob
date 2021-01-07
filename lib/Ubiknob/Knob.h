@@ -6,17 +6,35 @@ namespace ubiknob {
     typedef int KnobDiff;
     class KnobReader {
         public:
-        KnobReader(int pin1, int pin2): enc(pin1, pin2), prev(0) {
+        KnobReader(int pin1, int pin2):
+            enc(pin1, pin2),
+            prev(0),
+            prev_tmp(0),
+            consecutive(0)
+        {
         }
         KnobDiff update() {
             const auto current = enc.read() / 2;
-            const auto diff = current - prev;
-            prev = current;
-            return diff / abs(diff);
+            if (current == prev_tmp) {
+                ++consecutive;
+            } else {
+                consecutive = 0;
+                prev_tmp = current;
+            }
+            if (consecutive == 10) {
+                consecutive = 0;
+                const auto diff = current - prev;
+                prev = current;
+                return diff / abs(diff);
+            } else {
+                return 0;
+            }
         }
         private:
         Encoder enc;
         int prev;
+        int prev_tmp;
+        int consecutive;
     };
     enum ButtonState {
         unchanged,
