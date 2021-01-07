@@ -114,6 +114,12 @@ namespace ubiknob {
                         } else if (diff > 0) {
                             obs_up.runOnce();
                         }
+                    } else {
+                        if (diff < 0) {
+                            baro_down.runOnce();
+                        } else if (diff > 0) {
+                            baro_up.runOnce();
+                        }
                     }
                     break;
                 case KnobMode::mode_hdg:
@@ -191,6 +197,8 @@ namespace ubiknob {
         }
         private:
         ValueManager alt_diff;
+        static ButtonCommand baro_up;
+        static ButtonCommand baro_down;
         static ButtonCommand obs_up;
         static ButtonCommand obs_down;
         ValueManager hdg_diff;
@@ -210,6 +218,12 @@ namespace ubiknob {
         static ButtonCommand fms_cursor;
     };
 
+    ButtonCommand Publisher::baro_up = ButtonCommand(
+        XPlaneRef("sim/GPS/g1000n1_baro_up")
+    );
+    ButtonCommand Publisher::baro_down = ButtonCommand(
+        XPlaneRef("sim/GPS/g1000n1_baro_down")
+    );
     ButtonCommand Publisher::obs_up = ButtonCommand(
         XPlaneRef("sim/GPS/g1000n1_crs_up")
     );
