@@ -260,7 +260,7 @@ namespace ubiknob {
     );
     UpDownButtonCommand Publisher::fms_inner = UpDownButtonCommand(
         XPlaneRef("sim/GPS/g1000n1_fms_inner_up"),
-        XPlaneRef("sim/GPS/g1000n1_fms_innerdown")
+        XPlaneRef("sim/GPS/g1000n1_fms_inner_down")
     );
     ButtonCommand Publisher::fms_cursor = ButtonCommand(
         XPlaneRef("sim/GPS/g1000n1_cursor")
