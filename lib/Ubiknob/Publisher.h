@@ -42,6 +42,26 @@ namespace ubiknob {
         private:
         FlightSimCommand command;
     };
+    class UpDownButtonCommand {
+        public:
+        UpDownButtonCommand(
+            const _XpRefStr_ *up,
+            const _XpRefStr_ *down
+        ):
+        up(ButtonCommand(up)),
+        down(ButtonCommand(down))
+        {
+        }
+        void runUp() {
+            up.runOnce();
+        }
+        void runDown() {
+            down.runOnce();
+        }
+        private:
+        ButtonCommand up;
+        ButtonCommand down;
+    };
 
     class ValueManager {
         public:
@@ -110,15 +130,15 @@ namespace ubiknob {
                 case KnobMode::mode_obs:
                     if (is_inner) {
                         if (diff < 0) {
-                            obs_down.runOnce();
+                            obs.runDown();
                         } else if (diff > 0) {
-                            obs_up.runOnce();
+                            obs.runUp();
                         }
                     } else {
                         if (diff < 0) {
-                            baro_down.runOnce();
+                            baro.runDown();
                         } else if (diff > 0) {
-                            baro_up.runOnce();
+                            baro.runUp();
                         }
                     }
                     break;
@@ -131,15 +151,15 @@ namespace ubiknob {
                 case KnobMode::mode_fms:
                     if (is_inner) {
                         if (diff < 0) {
-                            fms_inner_down.runOnce();
+                            fms_inner.runDown();
                         } else if (diff > 0) {
-                            fms_inner_up.runOnce();
+                            fms_inner.runUp();
                         }
                     } else {
                         if (diff < 0) {
-                            fms_outer_down.runOnce();
+                            fms_outer.runDown();
                         } else if (diff > 0) {
-                            fms_outer_up.runOnce();
+                            fms_outer.runUp();
                         }
                     }
                     break;
@@ -197,10 +217,8 @@ namespace ubiknob {
         }
         private:
         ValueManager alt_diff;
-        static ButtonCommand baro_up;
-        static ButtonCommand baro_down;
-        static ButtonCommand obs_up;
-        static ButtonCommand obs_down;
+        static UpDownButtonCommand baro;
+        static UpDownButtonCommand obs;
         ValueManager hdg_diff;
         ValueManager vsp_diff;
         FrequencyManager com1;
@@ -211,23 +229,17 @@ namespace ubiknob {
         static ButtonCommand obs_sync;
         static ButtonCommand hdg_sync;
         static ButtonCommand vsp_sync;
-        static ButtonCommand fms_outer_up;
-        static ButtonCommand fms_outer_down;
-        static ButtonCommand fms_inner_up;
-        static ButtonCommand fms_inner_down;
+        static UpDownButtonCommand fms_outer;
+        static UpDownButtonCommand fms_inner;
         static ButtonCommand fms_cursor;
     };
 
-    ButtonCommand Publisher::baro_up = ButtonCommand(
-        XPlaneRef("sim/GPS/g1000n1_baro_up")
-    );
-    ButtonCommand Publisher::baro_down = ButtonCommand(
+    UpDownButtonCommand Publisher::baro = UpDownButtonCommand(
+        XPlaneRef("sim/GPS/g1000n1_baro_up"),
         XPlaneRef("sim/GPS/g1000n1_baro_down")
     );
-    ButtonCommand Publisher::obs_up = ButtonCommand(
-        XPlaneRef("sim/GPS/g1000n1_crs_up")
-    );
-    ButtonCommand Publisher::obs_down = ButtonCommand(
+    UpDownButtonCommand Publisher::obs = UpDownButtonCommand(
+        XPlaneRef("sim/GPS/g1000n1_crs_up"),
         XPlaneRef("sim/GPS/g1000n1_crs_down")
     );
     ButtonCommand Publisher::alt_sync = ButtonCommand(
@@ -242,17 +254,13 @@ namespace ubiknob {
     ButtonCommand Publisher::vsp_sync = ButtonCommand(
         XPlaneRef("sim/autopilot/vertical_speed_sync")
     );
-    ButtonCommand Publisher::fms_outer_up = ButtonCommand(
-        XPlaneRef("sim/GPS/g1000n1_fms_outer_up")
-    );
-    ButtonCommand Publisher::fms_outer_down = ButtonCommand(
+    UpDownButtonCommand Publisher::fms_outer = UpDownButtonCommand(
+        XPlaneRef("sim/GPS/g1000n1_fms_outer_up"),
         XPlaneRef("sim/GPS/g1000n1_fms_outer_down")
     );
-    ButtonCommand Publisher::fms_inner_up = ButtonCommand(
-        XPlaneRef("sim/GPS/g1000n1_fms_inner_up")
-    );
-    ButtonCommand Publisher::fms_inner_down = ButtonCommand(
-        XPlaneRef("sim/GPS/g1000n1_fms_inner_down")
+    UpDownButtonCommand Publisher::fms_inner = UpDownButtonCommand(
+        XPlaneRef("sim/GPS/g1000n1_fms_inner_up"),
+        XPlaneRef("sim/GPS/g1000n1_fms_innerdown")
     );
     ButtonCommand Publisher::fms_cursor = ButtonCommand(
         XPlaneRef("sim/GPS/g1000n1_cursor")
