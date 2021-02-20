@@ -1,6 +1,7 @@
 #pragma once
 
 #include "aircrafts/Aircraft.h"
+#include "Command.h"
 #include "Knob.h"
 #include "Publisher.h"
 
