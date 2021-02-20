@@ -66,9 +66,10 @@ namespace ubiknob {
         mode_hdg = 2,
         mode_vsp = 3,
         mode_fms = 4,
-        mode_com1 = 5,
-        mode_com2 = 6,
-        mode_nav1 = 7,
-        mode_nav2 = 8,
+        mode_spd = 5,
+        mode_com1 = 6,
+        mode_com2 = 7,
+        mode_nav1 = 8,
+        mode_nav2 = 9,
     };
 };

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <usb_flightsim.h>
 #include "aircrafts/Aircraft.h"
 #include "Command.h"
 #include "Knob.h"
