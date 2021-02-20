@@ -10,6 +10,6 @@ namespace ubiknob {
         public:
         virtual void update(KnobMode mode, KnobDiff diff, bool is_inner) = 0;
         virtual void update(KnobMode mode, ButtonState state) = 0;
-        virtual const FrequencyManager& getFrequencyManager(KnobMode mode) const = 0;
+        virtual const FrequencyInterface& getFrequencyInterface(KnobMode mode) const = 0;
     };
 }

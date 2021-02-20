@@ -2,6 +2,7 @@
 #include <usb_flightsim.h>
 
 #include "Frequency.h"
+#include "FrequencyInterface.h"
 #include "Knob.h"
 
 namespace ubiknob {
@@ -9,7 +10,7 @@ namespace ubiknob {
         const auto val = fsi.read();
         return Frequency(is_com, val / 100, val % 100);
     }
-    class FrequencyManager {
+    class FrequencyManager: public FrequencyInterface {
         public:
         FrequencyManager(const _XpRefStr_* active_ref, const _XpRefStr_* standby_ref, bool is_com):
         is_com(is_com)

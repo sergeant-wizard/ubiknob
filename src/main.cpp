@@ -4,11 +4,13 @@
 #include "Knob.h"
 #include "ModeSelector.h"
 #include "Pins.h"
+#include "aircrafts/A320.h"
 #include "aircrafts/GA.h"
 
 using namespace ubiknob;
 
-static auto aircraft = GA();
+static auto aircraft = A320();
+// static auto aircraft = GA();
 
 // modes
 static auto left_mode_knob = KnobReader(PIN_MIDDLE_INNER1, PIN_MIDDLE_INNER2);
@@ -86,7 +88,7 @@ void loop() {
         lcd.update(
             left_mode_selector.getMode(),
             right_mode_selector.getMode(),
-            publisher.getFrequencyManager(right_mode_selector.getMode())
+            publisher.getFrequencyInterface(right_mode_selector.getMode())
         );
     }
 }

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <LiquidCrystal.h>
 
-#include "FrequencyManager.h"
+#include "FrequencyInterface.h"
 #include "Knob.h"
 
 
@@ -12,6 +12,7 @@ namespace ubiknob {
     static const char hdg[4] = "HDG";
     static const char vsp[4] = "VSP";
     static const char fms[4] = "FMS";
+    static const char spd[4] = "SPD";
     static const char com1[5] = "COM1";
     static const char com2[5] = "COM2";
     static const char nav1[5] = "NAV1";
@@ -26,6 +27,8 @@ namespace ubiknob {
             return hdg;
             case KnobMode::mode_vsp:
             return vsp;
+            case KnobMode::mode_spd:
+            return spd;
             case KnobMode::mode_fms:
             return fms;
             case KnobMode::mode_com1:
@@ -48,7 +51,7 @@ namespace ubiknob {
         // 0123456789012345
         // ALT         NAV1
         // 114.000  109.050
-        void update(KnobMode left_mode, KnobMode right_mode, const FrequencyManager& manager) {
+        void update(KnobMode left_mode, KnobMode right_mode, const FrequencyInterface& frequency) {
             lcd.begin(16, 2);
             lcd.setCursor(0, 0);
             lcd.print(format_mode(left_mode));
@@ -56,8 +59,8 @@ namespace ubiknob {
             lcd.print(format_mode(right_mode));
 
             char frequency_output[17];
-            const auto active = manager.getActive();
-            const auto standby = manager.getStandby();
+            const auto active = frequency.getActive();
+            const auto standby = frequency.getStandby();
             snprintf(
                 frequency_output, 17, "%03d.%03d  %03d.%03d",
                 active.getMhz(), active.getKhz(), standby.getMhz(), standby.getKhz()

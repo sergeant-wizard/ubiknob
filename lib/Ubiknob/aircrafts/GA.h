@@ -120,6 +120,9 @@ namespace ubiknob {
                     case KnobMode::mode_nav2:
                         nav2.update(diff, is_inner);
                         break;
+                    case KnobMode::mode_spd:
+                        // noop
+                        break;
                 }
             }
             void update(KnobMode mode, ButtonState state) {
@@ -147,7 +150,7 @@ namespace ubiknob {
                     fms_cursor.run(state);
                 }
             }
-            const FrequencyManager& getFrequencyManager(KnobMode mode) const {
+            const FrequencyInterface& getFrequencyInterface(KnobMode mode) const {
                 if (mode == KnobMode::mode_com1) {
                     return com1;
                 } else if (mode == KnobMode::mode_com2) {
@@ -229,7 +232,7 @@ namespace ubiknob {
     struct GA: public Aircraft<5, 4> {
         public:
         GA():
-            Aircraft(publisher, left_modes, right_modes),
+            Aircraft(_publisher, ga::left_modes, ga::right_modes),
             _publisher(ga::GAPublisher())
         {}
         private:
