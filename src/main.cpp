@@ -4,29 +4,17 @@
 #include "Knob.h"
 #include "ModeSelector.h"
 #include "Pins.h"
-#include "Publisher.h"
+#include "aircrafts/GA.h"
 
 using namespace ubiknob;
 
-// modes
-static const KnobMode left_modes[5] = {
-    KnobMode::mode_alt,
-    KnobMode::mode_obs,
-    KnobMode::mode_hdg,
-    KnobMode::mode_vsp,
-    KnobMode::mode_fms,
-};
-static const KnobMode right_modes[4] = {
-    KnobMode::mode_com1,
-    KnobMode::mode_com2,
-    KnobMode::mode_nav1,
-    KnobMode::mode_nav2,
-};
+static auto aircraft = GA();
 
+// modes
 static auto left_mode_knob = KnobReader(PIN_MIDDLE_INNER1, PIN_MIDDLE_INNER2);
-static auto left_mode_selector = ModeSelector<5>(left_modes);
+static auto left_mode_selector = ModeSelector<aircraft.NUM_LEFT_MODES>(aircraft.left_modes);
 static auto right_mode_knob = KnobReader(PIN_MIDDLE_OUTER1, PIN_MIDDLE_OUTER2);
-static auto right_mode_selector = ModeSelector<4>(right_modes);
+static auto right_mode_selector = ModeSelector<aircraft.NUM_RIGHT_MODES>(aircraft.right_modes);
 
 // values
 static auto left_inner_knob = KnobReader(PIN_LEFT_INNER1, PIN_LEFT_INNER2);
@@ -37,7 +25,7 @@ static auto right_outer_knob = KnobReader(PIN_RIGHT_OUTER1, PIN_RIGHT_OUTER2);
 static auto right_button = ButtonReader(PIN_RIGHT_BUTTON);
 
 // publishers
-static auto publisher = Publisher();
+static auto& publisher = aircraft.publisher;
 
 static auto lcd = ubiknob::LCD(
     PIN_LCD_RS,
